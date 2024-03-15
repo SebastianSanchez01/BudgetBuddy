@@ -3,6 +3,7 @@ import 'package:pie_chart/pie_chart.dart' as pie;
 import 'database_helper.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'intro_screen.dart';
 
 final dbHelper = DatabaseHelper();
 Future<void> main() async {
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Monthly Spending Report'),
+      home: const IntroScreen(),
     );
   }
 }
