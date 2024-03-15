@@ -28,7 +28,7 @@ class DatabaseHelper {
 CREATE TABLE $table (
 $columnId INTEGER PRIMARY KEY,
 $columnTransactionCategory TEXT NOT NULL,
-$columnTransactionAmount FLOAT NOT NULL,
+$columnTransactionAmount FLOAT NOT NULL,=
 $columnTransactionDate TEXT NOT NULL
 )
 ''');

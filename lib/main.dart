@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pie_chart/pie_chart.dart';
+import 'package:pie_chart/pie_chart.dart' as pie;
 import 'database_helper.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 final dbHelper = DatabaseHelper();
 Future<void> main() async {
@@ -36,7 +37,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 String month = "March";
-double monthlyEarnings = 2500;
+double monthlyEarnings = 2500.21;
 double foodMonthlySpending = 250;
 double transportationMonthlySpending = 175;
 double entertainmentMonthlySpending = 100;
@@ -76,6 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
   @override
   Widget build(BuildContext context) {
+    double totalMonthlySpending = getTotalMonthlySpending();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -86,25 +88,25 @@ class _MyHomePageState extends State<MyHomePage> {
           height: 50,
         ),
         Center(
-          child: PieChart(
+          child: pie.PieChart(
             dataMap: dataMap,
             animationDuration: const Duration(milliseconds: 800),
             chartLegendSpacing: 32,
             chartRadius: MediaQuery.of(context).size.width / 2.5,
             colorList: colorList,
             initialAngleInDegree: 0,
-            chartType: ChartType.ring,
+            chartType: pie.ChartType.ring,
             ringStrokeWidth: 32,
             centerText: "$month \nSpending",
-            legendOptions: const LegendOptions(
+            legendOptions: const pie.LegendOptions(
               showLegendsInRow: false,
-              legendPosition: LegendPosition.right,
+              legendPosition: pie.LegendPosition.right,
               showLegends: true,
               legendTextStyle: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            chartValuesOptions: const ChartValuesOptions(
+            chartValuesOptions: const pie.ChartValuesOptions(
               showChartValueBackground: true,
               showChartValues: true,
               showChartValuesInPercentage: true,
@@ -115,6 +117,55 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         SizedBox(
           height: 50,
+        ),
+        Container(
+          height: 250,
+          padding: EdgeInsets.all(16.0),
+          child: BarChart(
+            BarChartData(
+              alignment: BarChartAlignment.spaceAround,
+              maxY: getTotalMonthlySpending() * 2.8,
+              barTouchData: BarTouchData(enabled: false),
+              titlesData: FlTitlesData(
+                topTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: false,
+                  ),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: bottomTitles,
+                  ),
+                ),
+              ),
+              barGroups: [
+                BarChartGroupData(
+                  x: 0,
+                  barRods: [
+                    BarChartRodData(
+                      toY: monthlyEarnings,
+                      color: Colors.green,
+                      width: 25,
+                    ),
+                  ],
+                ),
+                BarChartGroupData(
+                  x: 1,
+                  barRods: [
+                    BarChartRodData(
+                      toY: totalMonthlySpending,
+                      color: Colors.red,
+                      width: 25,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        Text(
+          "This month you have spent $totalMonthlySpending and you have earned $monthlyEarnings",
         ),
         ElevatedButton(
             onPressed: () {
@@ -128,8 +179,68 @@ class _MyHomePageState extends State<MyHomePage> {
         SizedBox(
           height: 50,
         ),
+        ListTile(
+          title: Text("Food:\t \$$foodMonthlySpending"),
+          tileColor: colorList[0],
+        ),
+        SizedBox(
+          height: 50,
+        ),
+        ListTile(
+          title: Text("Transportation:\t \$$transportationMonthlySpending"),
+          tileColor: colorList[1],
+        ),
+        SizedBox(
+          height: 50,
+        ),
+        ListTile(
+          title: Text("Entertainment:\t\$ $entertainmentMonthlySpending"),
+          tileColor: colorList[2],
+        ),
+        SizedBox(
+          height: 50,
+        ),
+        ListTile(
+          title: Text("Rent and Utilities:\t\$ $rentMonthlySpending"),
+          tileColor: colorList[3],
+        ),
+        SizedBox(
+          height: 50,
+        ),
+        ListTile(
+          title: Text("Insurance:\t \$$insuranceMonthlySpending"),
+          tileColor: colorList[4],
+        ),
+        SizedBox(
+          height: 50,
+        ),
+        ListTile(
+          title: Text("Other:\t\$$otherMontlySpending"),
+          tileColor: colorList[5],
+        ),
+        SizedBox(
+          height: 50,
+        ),
         ElevatedButton(onPressed: _query, child: Text("Print All Rows")),
       ]),
+    );
+  }
+
+  Widget bottomTitles(double value, TitleMeta meta) {
+    final titles = <String>['Earnings', 'Spending'];
+
+    final Widget text = Text(
+      titles[value.toInt()],
+      style: const TextStyle(
+        color: Color(0xff7589a2),
+        fontWeight: FontWeight.bold,
+        fontSize: 10,
+      ),
+    );
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      child: text,
     );
   }
 
