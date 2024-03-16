@@ -1,3 +1,4 @@
+// Sebastian Sanchez and Nohayla Messaoudi Project 01 main file
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart' as pie;
 import 'database_helper.dart';
@@ -38,23 +39,58 @@ class MyHomePage extends StatefulWidget {
 }
 
 String month = "March";
-double monthlyEarnings = 2500.21;
-double foodMonthlySpending = 250;
-double transportationMonthlySpending = 175;
-double entertainmentMonthlySpending = 100;
-double rentMonthlySpending = 175;
-double insuranceMonthlySpending = 300;
-double otherMontlySpending = 50;
 
 class _MyHomePageState extends State<MyHomePage> {
   Map<String, double> dataMap = {
-    "Food": foodMonthlySpending,
-    "Transportation": transportationMonthlySpending,
-    "Entertainment": entertainmentMonthlySpending,
-    "Rent and Utilites": rentMonthlySpending,
-    "Insurance": insuranceMonthlySpending,
-    "Other": otherMontlySpending,
+    "Food": 0,
+    "Transportation": 0,
+    "Entertainment": 0,
+    "Rent and Utilities": 0,
+    "Insurance": 0,
+    "Other": 0,
   };
+  double foodMonthlySpending = 0;
+  double transportationMonthlySpending = 0;
+  double entertainmentMonthlySpending = 0;
+  double rentMonthlySpending = 0;
+  double insuranceMonthlySpending = 0;
+  double otherMontlySpending = 0;
+  double totalMonthlySpending = 0;
+  double monthlyEarnings = 0;
+  double budget = 0;
+  @override
+  void initState() {
+    super.initState();
+    updateValues().whenComplete(() {
+      setState(() {});
+    });
+  }
+
+  Future<void> updateValues() async {
+    dataMap['Food'] = await _queryCategory('Food') as double;
+    dataMap['Transportation'] =
+        await _queryCategory('Transportation') as double;
+    dataMap['Entertainment'] = await _queryCategory('Entertainment') as double;
+    dataMap['Rent and Utilities'] =
+        await _queryCategory('Rent and Utilities') as double;
+    dataMap['Insurance'] = await _queryCategory('Insurance') as double;
+    dataMap['Other'] = await _queryCategory('Other') as double;
+    monthlyEarnings = await _queryCategory("Earning") as double;
+    budget = await _queryCategory("Budget") as double;
+
+    foodMonthlySpending = dataMap['Food'] as double;
+    transportationMonthlySpending = dataMap['Transportation'] as double;
+    entertainmentMonthlySpending = dataMap['Entertainment'] as double;
+    rentMonthlySpending = dataMap['Rent and Utilities'] as double;
+    insuranceMonthlySpending = dataMap['Insurance'] as double;
+    otherMontlySpending = dataMap['Other'] as double;
+    totalMonthlySpending = getTotalMonthlySpending();
+  }
+
+  Future<double> _queryCategory(String category) async {
+    double amount = await dbHelper.queryCategory(category);
+    return amount;
+  }
 
   double getTotalMonthlySpending() {
     double totalMonthlySpending = 0;
@@ -65,7 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _refreshData() {
-    setState(() {});
+    updateValues().whenComplete(() {
+      setState(() {});
+    });
   }
 
   final colorList = <Color>[
@@ -78,7 +116,6 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
   @override
   Widget build(BuildContext context) {
-    double totalMonthlySpending = getTotalMonthlySpending();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -125,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: BarChart(
             BarChartData(
               alignment: BarChartAlignment.spaceAround,
-              maxY: getTotalMonthlySpending() * 2.8,
+              maxY: budget * 2.8,
               barTouchData: BarTouchData(enabled: false),
               titlesData: FlTitlesData(
                 topTitles: AxisTitles(
@@ -155,6 +192,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   x: 1,
                   barRods: [
                     BarChartRodData(
+                      toY: budget,
+                      color: Colors.blue,
+                      width: 25,
+                    ),
+                  ],
+                ),
+                BarChartGroupData(
+                  x: 2,
+                  barRods: [
+                    BarChartRodData(
                       toY: totalMonthlySpending,
                       color: Colors.red,
                       width: 25,
@@ -166,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         Text(
-          "This month you have spent $totalMonthlySpending and you have earned $monthlyEarnings",
+          "This month you have spent ${formatDoubleValue(totalMonthlySpending)} and you have earned ${formatDoubleValue(monthlyEarnings)}. Your Budget is ${formatDoubleValue(budget)}",
         ),
         ElevatedButton(
             onPressed: () {
@@ -181,54 +228,64 @@ class _MyHomePageState extends State<MyHomePage> {
           height: 50,
         ),
         ListTile(
-          title: Text("Food:\t \$$foodMonthlySpending"),
+          title: Text("Food:\t \$${formatDoubleValue(foodMonthlySpending)}"),
           tileColor: colorList[0],
         ),
         SizedBox(
           height: 50,
         ),
         ListTile(
-          title: Text("Transportation:\t \$$transportationMonthlySpending"),
+          title: Text(
+              "Transportation:\t \$${formatDoubleValue(transportationMonthlySpending)}"),
           tileColor: colorList[1],
         ),
         SizedBox(
           height: 50,
         ),
         ListTile(
-          title: Text("Entertainment:\t\$ $entertainmentMonthlySpending"),
+          title: Text(
+              "Entertainment:\t\$ ${formatDoubleValue(entertainmentMonthlySpending)}"),
           tileColor: colorList[2],
         ),
         SizedBox(
           height: 50,
         ),
         ListTile(
-          title: Text("Rent and Utilities:\t\$ $rentMonthlySpending"),
+          title: Text(
+              "Rent and Utilities:\t\$ ${formatDoubleValue(rentMonthlySpending)}"),
           tileColor: colorList[3],
         ),
         SizedBox(
           height: 50,
         ),
         ListTile(
-          title: Text("Insurance:\t \$$insuranceMonthlySpending"),
+          title: Text(
+              "Insurance:\t \$${formatDoubleValue(insuranceMonthlySpending)}"),
           tileColor: colorList[4],
         ),
         SizedBox(
           height: 50,
         ),
         ListTile(
-          title: Text("Other:\t\$$otherMontlySpending"),
+          title: Text("Other:\t\$${formatDoubleValue(otherMontlySpending)}"),
           tileColor: colorList[5],
         ),
         SizedBox(
           height: 50,
         ),
-        ElevatedButton(onPressed: _query, child: Text("Print All Rows")),
+        /*       ElevatedButton(onPressed: _query, child: Text("Print All Rows")),
+        ElevatedButton(
+            onPressed: () async {
+              double foodAmount = await _queryCategory('Food');
+              print('Total food is: $foodAmount');
+            },
+            child: Text("Query Food")), */
       ]),
     );
   }
 
   Widget bottomTitles(double value, TitleMeta meta) {
-    final titles = <String>['Earnings', 'Spending'];
+    final titles = <String>['Earnings', 'Budget', 'Spending'];
 
     final Widget text = Text(
       titles[value.toInt()],
@@ -251,6 +308,10 @@ class _MyHomePageState extends State<MyHomePage> {
     for (final row in allRows) {
       debugPrint(row.toString());
     }
+  }
+
+  String formatDoubleValue(double amount) {
+    return amount.toStringAsFixed(2);
   }
 }
 

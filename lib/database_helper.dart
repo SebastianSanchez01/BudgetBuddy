@@ -28,7 +28,7 @@ class DatabaseHelper {
 CREATE TABLE $table (
 $columnId INTEGER PRIMARY KEY,
 $columnTransactionCategory TEXT NOT NULL,
-$columnTransactionAmount FLOAT NOT NULL,=
+$columnTransactionAmount DECIMAL(10, 2) NOT NULL,
 $columnTransactionDate TEXT NOT NULL
 )
 ''');
@@ -48,6 +48,15 @@ $columnTransactionDate TEXT NOT NULL
 // a key-value list of columns.
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     return await _db.query(table);
+  }
+
+  Future<double> queryCategory(String category) async {
+    List<Map<String, dynamic>> list = await _db.rawQuery(
+      'SELECT SUM($columnTransactionAmount) as total FROM $table WHERE $columnTransactionCategory=?',
+      [category],
+    );
+    num amount = list[0]['total'] ?? 0.0;
+    return amount.toDouble();
   }
 
 // All of the methods (insert, query, update, delete) can also be done using

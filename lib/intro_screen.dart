@@ -58,7 +58,7 @@ class _IntroScreenState extends State<IntroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Expense Tracker - Setup'),
+        title: const Text('Budget Buddy - Setup'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -74,6 +74,10 @@ class _IntroScreenState extends State<IntroScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a budget';
+                    } else if (!value.contains(RegExp(r'\.')) ||
+                        value.length < 4 ||
+                        value.contains(RegExp(r'[a-zA-Z]'))) {
+                      return 'Please enter a valid dollar amount with a period and cents';
                     }
                     return null;
                   },
@@ -88,6 +92,10 @@ class _IntroScreenState extends State<IntroScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter monthly income';
+                    } else if (!value.contains(RegExp(r'\.')) ||
+                        value.length < 4 ||
+                        value.contains(RegExp(r'[a-zA-Z]'))) {
+                      return 'Please enter a valid dollar amount with a period and cents';
                     }
                     return null;
                   },
@@ -115,7 +123,12 @@ class _IntroScreenState extends State<IntroScreen> {
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter an amount';
+                              } else if (!value.contains(RegExp(r'\.')) ||
+                                  value.length < 4 ||
+                                  value.contains(RegExp(r'[a-zA-Z]'))) {
+                                return 'Please enter a valid dollar amount with a period and cents';
                               }
+
                               return null;
                             },
                             onSaved: (value) {
@@ -137,6 +150,8 @@ class _IntroScreenState extends State<IntroScreen> {
                         Map<String, dynamic> earnings = {
                           "Earning": monthlyIncome
                         };
+                        Map<String, dynamic> budgetHelper = {"Budget": budget};
+                        _insert(budgetHelper);
                         _insert(earnings);
                         _insert(expenseAllocations);
                         _saveIntroScreenStatus();
